@@ -1,4 +1,5 @@
 import pytest
+from schemas.user_schema import UserSchema
 
 def test_get_users_status_code_and_schema(api_client):
     response = api_client.get("/users")
@@ -6,11 +7,10 @@ def test_get_users_status_code_and_schema(api_client):
     users = response.json()
     assert isinstance(users, list)
     assert len(users) > 0
-    
-    first_user = users[0]
-    assert "id" in first_user
-    assert "name" in first_user
-    assert "email" in first_user
+
+    # Validate the full data contract structure of the first returned user
+    validated_user = UserSchema(**users[0])
+    assert validated_user.id == users[0]["id"]
 
 def test_create_user_response_data(api_client, sample_user_payload):
     response = api_client.post("/users", json=sample_user_payload)
