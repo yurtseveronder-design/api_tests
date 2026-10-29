@@ -1,4 +1,5 @@
 import pytest
+import logging
 from utils.api_client import APIClient
 
 ENV_URLS = {
@@ -31,3 +32,15 @@ def sample_user_payload():
         "username": "Bret",
         "email": "Sincere@april.biz"
     }
+
+@pytest.hookimpl(hookwrapper=True)
+def pytest_runtest_makereport(item, call):
+    outcome = yield
+    report = outcome.get_result()
+    extra = getattr(report, "extra", [])
+    if report.when == "call" and report.failed:
+        # Attach standard output/logging details into the HTML report on failure
+        pytest_html = item.config.pluginmanager.getplugin("html")
+        if pytest_html:
+            extra.append(pytest_html.extras.text("Test failed during execution. Check logs above for API payloads.", name="Failure Context"))
+            report.extra = extra
