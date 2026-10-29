@@ -24,6 +24,13 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Run Pytest Suite
+    - name: Run Pytest Suite & Generate HTML Report
       run: |
-        python -m pytest -v tests/
+        python -m pytest -v tests/ --env=dev --html=report.html --self-contained-html
+
+    - name: Upload HTML Test Report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: pytest-html-report
+        path: report.html
