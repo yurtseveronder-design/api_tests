@@ -1,44 +1,48 @@
+!\[API Test Suite CI](https://github.com/yurtseveronder-design/api\_tests/actions/workflows/tests.yml/badge.svg)
+
+
+
 \# Production-Grade API Automation Framework
 
 
 
-An automated API test suite targeting JSONPlaceholder endpoints built using Python, pytest, and Requests.
+A modular, enterprise-ready API test automation framework built with \*\*Python\*\*, \*\*Pytest\*\*, and \*\*Requests\*\*, integrated with continuous integration via \*\*GitHub Actions\*\* and containerized with \*\*Docker\*\*.
 
 
 
-\## Key Features
-
-\- \*\*Modular Architecture\*\*: Clean separation of test cases, global fixtures (`conftest.py`), client helpers, and central configuration.
-
-\- \*\*APIClient Abstraction\*\*: Encapsulated HTTP request wrapper methods (`GET`, `POST`, `PUT`, `DELETE`).
-
-\- \*\*Data-Driven Testing\*\*: Parametrized negative tests validating error status codes (`404`).
-
-\- \*\*Schema \& Type Validation\*\*: Strict assertions on JSON key presence and data types.
-
-\- \*\*Reporting\*\*: Automated execution dashboard generation via `pytest-html`.
+\---
 
 
 
-\## Project Structure
+\## 🛠️ Key Features
 
-```text
 
-api\_tests/
 
-├── config.py            # Central configuration (BASE\_URL)
+\- \*\*Modular Architecture\*\*: Clean separation of test cases (`tests/`), API client wrappers (`utils/`), dynamic environment setup (`conftest.py`), and target settings.
 
-├── conftest.py          # Pytest fixtures \& APIClient injection
+\- \*\*Full CRUD \& Schema Assertions\*\*: Validates `GET`, `POST`, `PUT`, `DELETE` operations and validates response contracts and JSON types.
 
-├── requirements.txt     # Dependency management file
+\- \*\*Multi-Environment Support\*\*: Switch target environments dynamically using pytest CLI flags (`--env=dev|staging|prod`).
 
-├── .gitignore           # Git ignore rules
+\- \*\*CI/CD Pipeline\*\*: GitHub Actions workflows run tests automatically on push/PR and archive HTML execution reports as build artifacts.
 
-├── utils/
+\- \*\*Docker Ready\*\*: Fully containerized for instant execution in any environment.
 
-│   └── api\_client.py   # HTTP client wrapper class
 
-└── tests/
 
-&#x20;   └── test\_users.py    # Full CRUD \& schema test suite
+\---
+
+
+
+\## 🚀 Quick Start (Local Setup)
+
+
+
+1\. \*\*Clone the repository\*\*:
+
+&#x20;  ```bash
+
+&#x20;  git clone \[https://github.com/yurtseveronder-design/api\_tests.git](https://github.com/yurtseveronder-design/api\_tests.git)
+
+&#x20;  cd api\_tests
 
