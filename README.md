@@ -1,14 +1,26 @@
-# API Test Automation Framework
+# API Tests
 
-A lightweight Python test automation framework built with `pytest` for validating REST APIs, request schemas, and basic endpoint behavior.
+A robust, production-ready API test automation framework built for reliable contract validation, robust retry logic, and seamless CI/CD execution[cite: 8].
 
-## What it does
-* **Structured API Testing**: Uses `pytest` and custom fixtures (`conftest.py`) for clean test execution.
-* **Schema Validation**: Checks response formats and data structures.
-* **Containerized Setup**: Includes a `Dockerfile` for running tests in an isolated container.
+## What It Solves
+Testing REST APIs reliably requires more than just basic status code checks. This framework handles data contract validation, network flakes with automatic retries, and clean reporting out of the box.
 
-## Getting Started
+## Core Features
+* **Pydantic Contract Validation (`schemas/`):** Ensures API response structures match expected schemas precisely.
+* **Resilient Networking (`utils/`):** Built-in automatic retries with exponential backoff to handle flaky network conditions.
+* **Comprehensive Reporting:** Integrated Allure reporting for clear visual test results[cite: 8].
+* **Containerized Execution:** Docker support for running tests consistently across any environment.
+* **Automated CI/CD:** Continuous test execution configured via GitHub Actions[cite: 8].
 
-1. **Install dependencies:**
+## Project Structure
+* `schemas/`: Pydantic models for API response contracts.
+* `tests/`: Automated test suite covering endpoints.
+* `utils/`: Helper functions, including retry logic and request handlers.
+* `assets/`: Test assets and documentation files.
+* `.github/workflows/`: Automated CI pipeline configuration.
+
+## Quick Start
+1. Clone the repository and install dependencies.
+2. Run the test suite locally using pytest:
    ```bash
-   pip install -r requirements.txt
+   python -m pytest -v
