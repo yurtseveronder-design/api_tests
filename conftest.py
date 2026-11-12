@@ -1,29 +1,45 @@
 import pytest
-import logging
-from utils.api_client import APIClient
+from client import APIClient
 
 ENV_URLS = {
     "dev": "https://jsonplaceholder.typicode.com",
-    "staging": "https://jsonplaceholder.typicode.com",
-    "prod": "https://jsonplaceholder.typicode.com"
+    "auth_test": "https://httpbin.org",
+    "staging": "https://staging.api.example.com",
+    "prod": "https://api.example.com"
 }
 
 def pytest_addoption(parser):
     parser.addoption(
-        "--env",
-        action="store",
-        default="dev",
-        help="Target environment: dev, staging, or prod"
+        "--env", action="store", default="dev", help="Target environment: dev, staging, or prod"
     )
 
 @pytest.fixture(scope="session")
 def base_url(request):
+    """Resolve base URL from command line --env option."""
     env = request.config.getoption("--env").lower()
     return ENV_URLS.get(env, ENV_URLS["dev"])
 
 @pytest.fixture(scope="session")
 def api_client(base_url):
+    """Default API client fixture."""
     return APIClient(base_url=base_url)
+
+@pytest.fixture
+def bearer_client(base_url):
+    """Client configured with a Bearer Token."""
+    token = "test-bearer-token-12345"
+    return APIClient(base_url=base_url, auth_type="bearer", credentials=token)
+
+@pytest.fixture
+def api_key_client(base_url):
+    """Client configured with an API Key Header."""
+    key = "secret-api-key-abcde"
+    return APIClient(base_url=base_url, auth_type="api_key", credentials=key, api_key_header="X-API-Key")
+
+@pytest.fixture
+def basic_auth_client(base_url):
+    """Client configured with Basic Auth."""
+    return APIClient(base_url=base_url, auth_type="basic", credentials=("testuser", "testpassword"))
 
 @pytest.fixture
 def sample_user_payload():
@@ -32,15 +48,3 @@ def sample_user_payload():
         "username": "Bret",
         "email": "Sincere@april.biz"
     }
-
-@pytest.hookimpl(hookwrapper=True)
-def pytest_runtest_makereport(item, call):
-    outcome = yield
-    report = outcome.get_result()
-    extra = getattr(report, "extra", [])
-    if report.when == "call" and report.failed:
-        # Attach standard output/logging details into the HTML report on failure
-        pytest_html = item.config.pluginmanager.getplugin("html")
-        if pytest_html:
-            extra.append(pytest_html.extras.text("Test failed during execution. Check logs above for API payloads.", name="Failure Context"))
-            report.extra = extra
