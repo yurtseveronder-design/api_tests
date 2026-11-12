@@ -1,5 +1,10 @@
 pytest
 requests
+httpx
 pydantic
-pytest-html
-allure-pytest
+pytest-cov
+pytest-mock
+pytest-xdist
+respx
+tenacity
+requests-toolbelt

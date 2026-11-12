@@ -23,8 +23,8 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install pytest requests httpx
+        pip install -r requirements.txt
 
-    - name: Run Pytest Suite
+    - name: Run Pytest Suite in Parallel with Coverage
       run: |
-        python -m pytest -v
+        python -m pytest -v -n auto --cov=api_tests
