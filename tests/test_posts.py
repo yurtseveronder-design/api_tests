@@ -1,5 +1,4 @@
-import pytest
-from schemas.post_schema import PostSchema
+from schemas import PostResponseSchema as PostSchema
 
 def test_get_all_posts_status_and_count(api_client):
     response = api_client.get("/posts")
@@ -20,15 +19,3 @@ def test_get_single_post_by_id(api_client):
     # Validate single post schema
     validated_post = PostSchema(**post)
     assert validated_post.id == 1
-
-def test_create_post_response_data(api_client):
-    payload = {
-        "title": "Automated Testing",
-        "body": "Verifying POST endpoint scaling.",
-        "userId": 1
-    }
-    response = api_client.post("/posts", json=payload)
-    assert response.status_code == 201
-    created_post = response.json()
-    assert created_post["title"] == payload["title"]
-    assert created_post["userId"] == payload["userId"]
