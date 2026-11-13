@@ -1,4 +1,11 @@
 __pycache__/
+*.pyc
 .pytest_cache/
-*.html
+.venv/
 .env
+.coverage
+htmlcov/
+reports/
+allure-results/
+*.egg-info/
+audit_ledger.jsonl
