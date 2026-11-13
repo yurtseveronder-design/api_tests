@@ -27,6 +27,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Security scan (Bandit)
+        run: |
+          pip install bandit
+          bandit -r framework schemas -ll
+
       - name: Check out ai-sentinel (system under test)
         uses: actions/checkout@v4
         with:

@@ -8,6 +8,7 @@ A compact pytest framework for API testing: one HTTP client, strict Pydantic con
 | `framework/client.py` | The only HTTP client: timeouts, retries with backoff (idempotent methods only), bearer / basic / API-key auth, status assertions, logging |
 | `framework/config.py` | Environment and gateway settings, all overridable via env vars |
 | `schemas/` | Pydantic contracts (`jsonplaceholder.py`, `sentinel.py`); unknown fields are rejected |
+| `schemas/petstore_generated.py` | Pydantic models generated from the Swagger Petstore spec (not used by tests yet) |
 | `tests/unit/` | Offline tests of the client and schemas against a local stub server |
 | `tests/jsonplaceholder/` | Contract, CRUD and negative tests against the public JSONPlaceholder API |
 | `tests/sentinel/` | Health, auth, injection-blocking, payload-limit and rate-limit tests for the ai-sentinel gateway |
@@ -50,4 +51,4 @@ docker run --rm --network host -e SENTINEL_API_KEY=test-api-key api-tests pytest
 ```
 
 ## CI
-`.github/workflows/ci.yml` checks out and starts the ai-sentinel gateway, runs the whole suite with a 80% coverage gate on `framework/`, runs the rate-limit test against a restarted gateway, uploads the HTML/Allure reports, and builds the Docker image and runs the unit tests inside it.
+`.github/workflows/ci.yml` checks out and starts the ai-sentinel gateway, runs the whole suite with a 80% coverage gate on `framework/`, runs a Bandit security scan, runs the rate-limit test against a restarted gateway, uploads the HTML/Allure reports, and builds the Docker image and runs the unit tests inside it.
