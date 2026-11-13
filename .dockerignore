@@ -1,6 +1,9 @@
 .git
 .github
+.env
+.venv
 __pycache__
 .pytest_cache
-report.html
-assets/
+reports
+htmlcov
+allure-results

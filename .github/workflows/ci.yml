@@ -1,0 +1,85 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      AI_SENTINEL_API_KEY: test-api-key
+      SENTINEL_API_KEY: test-api-key
+      SENTINEL_REQUIRED: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Security scan (Bandit)
+        run: |
+          pip install bandit
+          bandit -r framework schemas -ll
+
+      - name: Check out ai-sentinel (system under test)
+        uses: actions/checkout@v4
+        with:
+          repository: yurtseveronder-design/ai-sentinel
+          path: .sut/ai-sentinel
+
+      - name: Install ai-sentinel
+        run: pip install -e .sut/ai-sentinel
+
+      - name: Start gateway
+        run: |
+          nohup uvicorn ai_sentinel.api.gateway:app --port 8000 > gateway.log 2>&1 &
+          for i in $(seq 1 30); do
+            curl -sf http://127.0.0.1:8000/health && exit 0
+            sleep 1
+          done
+          cat gateway.log; exit 1
+
+      - name: Run test suite with coverage
+        run: >
+          python -m pytest -v
+          --cov=framework --cov-report=term-missing --cov-report=xml --cov-fail-under=80
+          --html=reports/report.html --self-contained-html
+          --alluredir=reports/allure-results
+
+      - name: Restart gateway for the rate-limit test
+        if: always()
+        run: |
+          pkill -f "uvicorn ai_sentinel" || true
+          sleep 1
+          nohup uvicorn ai_sentinel.api.gateway:app --port 8000 > gateway2.log 2>&1 &
+          for i in $(seq 1 30); do curl -sf http://127.0.0.1:8000/health && break; sleep 1; done
+          python -m pytest -v -m rate_limit
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-reports
+          path: |
+            reports/
+            coverage.xml
+            gateway.log
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build image and run offline tests inside it
+        run: |
+          docker build -t api-tests .
+          docker run --rm api-tests python -m pytest -q -m unit
