@@ -7,8 +7,9 @@
 #   SENTINEL_UI_DIR (default .sut/sentinel-ui)
 set -euo pipefail
 
-STATE=".stack"
-UI_DIR="${SENTINEL_UI_DIR:-.sut/sentinel-ui}"
+ROOT="$(pwd)"
+STATE="$ROOT/.stack"
+UI_DIR="${SENTINEL_UI_DIR:-$ROOT/.sut/sentinel-ui}"
 SEMANTIC_KEY="${SEMANTIC_API_KEY:-test-semantic-key}"
 SENTINEL_KEY="${SENTINEL_API_KEY:-test-api-key}"
 UI_KEY="${UI_API_KEY:-ui-test-key}"
@@ -35,7 +36,7 @@ start_gateway() {
 start_ui() {
   (cd "$UI_DIR" && SENTINEL_API_KEYS="$UI_KEY" SENTINEL_JWT_SECRET=ui-test-secret \
     AI_SENTINEL_URL=http://127.0.0.1:8000 AI_SENTINEL_API_KEY="$SENTINEL_KEY" \
-    nohup uvicorn gateway:app --port 8200 > "$OLDPWD/$STATE/ui.log" 2>&1 & echo $! > "$OLDPWD/$STATE/ui.pid")
+    nohup uvicorn gateway:app --port 8200 > "$STATE/ui.log" 2>&1 & echo $! > "$STATE/ui.pid")
   wait_for http://127.0.0.1:8200 ui
 }
 
