@@ -3,7 +3,8 @@ import pytest
 from framework import config
 from framework.client import APIClient
 
-_DIR_MARKERS = {"unit": "unit", "jsonplaceholder": "external", "sentinel": "sentinel"}
+_DIR_MARKERS = {"unit": "unit", "jsonplaceholder": "external", "sentinel": "sentinel",
+                "semantic": "semantic", "stack": "stack"}
 
 
 def pytest_addoption(parser):

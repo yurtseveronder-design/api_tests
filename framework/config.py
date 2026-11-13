@@ -19,7 +19,15 @@ ENVIRONMENTS = {
 # ai-sentinel gateway (https://github.com/yurtseveronder-design/ai-sentinel)
 SENTINEL_BASE_URL = os.getenv("SENTINEL_BASE_URL", "http://127.0.0.1:8000")
 SENTINEL_API_KEY = os.getenv("SENTINEL_API_KEY", "test-api-key")
-# Set to "1" (CI does) to fail instead of skip when the gateway is unreachable.
+# sentinel-semantic (https://github.com/yurtseveronder-design/sentinel-semantic)
+SEMANTIC_BASE_URL = os.getenv("SEMANTIC_BASE_URL", "http://127.0.0.1:8100")
+SEMANTIC_API_KEY = os.getenv("SEMANTIC_API_KEY", "test-semantic-key")
+
+# sentinel-ui front gateway (https://github.com/yurtseveronder-design/sentinel-ui)
+UI_BASE_URL = os.getenv("UI_BASE_URL", "http://127.0.0.1:8200")
+UI_API_KEY = os.getenv("UI_API_KEY", "ui-test-key")
+
+# Set to "1" (CI does) to fail instead of skip when a service is unreachable.
 SENTINEL_REQUIRED = os.getenv("SENTINEL_REQUIRED", "0") == "1"
 
 

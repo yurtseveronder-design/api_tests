@@ -9,3 +9,5 @@ reports/
 allure-results/
 *.egg-info/
 audit_ledger.jsonl
+.stack/
+.sut/
