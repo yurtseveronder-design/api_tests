@@ -46,3 +46,28 @@ def test_health_and_error_schema():
     with pytest.raises(ValidationError):
         HealthSchema(status="down")
     assert ErrorSchema(detail="x").detail == "x"
+
+
+def test_scan_schema_accepts_optional_semantic_block():
+    from schemas import ScanSchema
+
+    base = dict(status="allowed", action="ALLOW", risk_score=0.0, reasons=[])
+    assert ScanSchema(**base).semantic is None
+    with_semantic = ScanSchema(**base, semantic={"intent": "general_chat", "guardrail_profile": "standard",
+                                                 "requires_rag": False, "sensitivity_tags": [], "filters": {},
+                                                 "engine": "keyword"})
+    assert with_semantic.semantic.intent == "general_chat"
+    with pytest.raises(ValidationError):
+        ScanSchema(**base, semantic={"intent": "x", "unexpected": 1})
+
+
+def test_semantic_contracts_reject_unknown_profile_and_engine():
+    from schemas import RouteSchema, SemanticHealthSchema
+
+    route = dict(primary_intent="x", all_intents=["x"], confidence_scores={"x": 0.1},
+                 guardrail_profile="standard", requires_rag=False, sensitivity_tags=[])
+    assert RouteSchema(**route)
+    with pytest.raises(ValidationError):
+        RouteSchema(**{**route, "guardrail_profile": "lenient"})
+    with pytest.raises(ValidationError):
+        SemanticHealthSchema(status="ok", service="sentinel-semantic", version="1", engine="magic")

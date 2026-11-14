@@ -32,23 +32,27 @@ jobs:
           pip install bandit
           bandit -r framework schemas -ll
 
-      - name: Check out ai-sentinel (system under test)
+      - name: Check out the rest of the stack
         uses: actions/checkout@v4
         with:
           repository: yurtseveronder-design/ai-sentinel
           path: .sut/ai-sentinel
+      - uses: actions/checkout@v4
+        with:
+          repository: yurtseveronder-design/sentinel-semantic
+          path: .sut/sentinel-semantic
+      - uses: actions/checkout@v4
+        with:
+          repository: yurtseveronder-design/sentinel-ui
+          path: .sut/sentinel-ui
 
-      - name: Install ai-sentinel
-        run: pip install -e .sut/ai-sentinel
-
-      - name: Start gateway
+      - name: Install the stack
         run: |
-          nohup uvicorn ai_sentinel.api.gateway:app --port 8000 > gateway.log 2>&1 &
-          for i in $(seq 1 30); do
-            curl -sf http://127.0.0.1:8000/health && exit 0
-            sleep 1
-          done
-          cat gateway.log; exit 1
+          pip install -e .sut/ai-sentinel -e .sut/sentinel-semantic
+          pip install fastapi uvicorn pydantic
+
+      - name: Start sentinel-semantic, ai-sentinel and sentinel-ui
+        run: scripts/stack.sh start
 
       - name: Run test suite with coverage
         run: >
@@ -60,10 +64,7 @@ jobs:
       - name: Restart gateway for the rate-limit test
         if: always()
         run: |
-          pkill -f "uvicorn ai_sentinel" || true
-          sleep 1
-          nohup uvicorn ai_sentinel.api.gateway:app --port 8000 > gateway2.log 2>&1 &
-          for i in $(seq 1 30); do curl -sf http://127.0.0.1:8000/health && break; sleep 1; done
+          scripts/stack.sh restart-gateway
           python -m pytest -v -m rate_limit
 
       - uses: actions/upload-artifact@v4
@@ -73,7 +74,7 @@ jobs:
           path: |
             reports/
             coverage.xml
-            gateway.log
+            .stack/*.log
 
   docker:
     runs-on: ubuntu-latest

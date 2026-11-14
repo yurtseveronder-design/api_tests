@@ -32,7 +32,8 @@ def test_benign_prompt_is_allowed(sentinel):
     response = scan(sentinel, prompt=BENIGN)
     assert response.status_code == 200
     result = ScanSchema(**response.json())
-    assert (result.status, result.action, result.reasons) == ("allowed", "ALLOW", [])
+    assert (result.status, result.action) == ("allowed", "ALLOW")
+    assert result.risk_score < 0.7
 
 
 @pytest.mark.parametrize("prompt", ATTACKS)

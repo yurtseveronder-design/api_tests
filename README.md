@@ -11,6 +11,9 @@ A compact pytest framework for API testing: one HTTP client, strict Pydantic con
 | `schemas/petstore_generated.py` | Pydantic models generated from the Swagger Petstore spec (not used by tests yet) |
 | `tests/unit/` | Offline tests of the client and schemas against a local stub server |
 | `tests/jsonplaceholder/` | Contract, CRUD and negative tests against the public JSONPlaceholder API |
+| `tests/semantic/` | Contract, auth and validation tests for the sentinel-semantic service |
+| `tests/stack/` | End-to-end: client → sentinel-ui → ai-sentinel → sentinel-semantic |
+| `scripts/stack.sh` | Starts / stops the whole stack for local runs and CI |
 | `tests/sentinel/` | Health, auth, injection-blocking, payload-limit and rate-limit tests for the ai-sentinel gateway |
 
 ## Run
@@ -32,6 +35,19 @@ SENTINEL_API_KEY=test-api-key pytest -m sentinel
 pytest -m rate_limit
 ```
 Set `SENTINEL_REQUIRED=1` to fail instead of skip when the gateway is unreachable (CI does this).
+
+### Whole stack (end to end)
+```bash
+git clone https://github.com/yurtseveronder-design/ai-sentinel .sut/ai-sentinel
+git clone https://github.com/yurtseveronder-design/sentinel-semantic .sut/sentinel-semantic
+git clone https://github.com/yurtseveronder-design/sentinel-ui .sut/sentinel-ui
+pip install -e .sut/ai-sentinel -e .sut/sentinel-semantic fastapi uvicorn pydantic
+
+scripts/stack.sh start            # semantic :8100, ai-sentinel :8000, sentinel-ui :8200
+pytest -m "semantic or sentinel or stack"
+scripts/stack.sh stop
+```
+Keys default to test values (`SEMANTIC_API_KEY`, `SENTINEL_API_KEY`, `UI_API_KEY`); override them with environment variables.
 
 ### Other environments
 `pytest --env staging` reads `STAGING_BASE_URL` (likewise `prod` / `PROD_BASE_URL`); `--base-url URL` overrides directly. See `.env.example` for all settings.
